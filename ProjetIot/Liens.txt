@@ -1,0 +1,13 @@
+Projet wokwi:
+https://wokwi.com/projects/426533449236603905
+
+Thingsboard:
+-Dashboard
+https://demo.thingsboard.io/dashboard/c700c680-0a9f-11f0-b029-835883384c03?publicId=bd6a1560-020a-11f0-9dbc-834dadad7dd9
+-Dispositif
+ID:733d3b70-0903-11f0-981d-57d611b80734
+Token:7hxlh970qiug6qnu3t4z
+
+
+Google Colab pour Inférence(gestion_prediction.iynb):
+https://colab.research.google.com/drive/1qIL6sxHViF9ls2TumySPnUeR6l1wzQRC?usp=sharing

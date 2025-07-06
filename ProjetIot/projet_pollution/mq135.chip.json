@@ -1,0 +1,17 @@
+{
+  "name": "mq135",
+  "author": "Misbah Juwayriyyah",
+  "pins": [
+    "VCC",
+    "GND",
+    "A0",
+    "D0","","",""
+  ],
+  "controls": [{
+      "id": "ppm",
+      "label": "PPM",
+      "type": "slider",
+      "min":200,
+      "max":1000
+    }]
+}

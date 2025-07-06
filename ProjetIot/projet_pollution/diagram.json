@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "author": "Anonymous maker",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "chip-mq135", "id": "chip1", "top": 77.82, "left": 235.2, "attrs": {} },
+    { "type": "wokwi-dht22", "id": "dht1", "top": -201.3, "left": -5.4, "attrs": {} },
+    { "type": "wokwi-gas-sensor", "id": "gas1", "top": 60.3, "left": -290.6, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "gas1:VCC", "esp:5V", "red", [ "h86.4", "v95.1" ] ],
+    [ "chip1:VCC", "esp:5V", "red", [ "h-86.4", "v153.6", "h-144" ] ],
+    [ "dht1:VCC", "esp:5V", "red", [ "v0", "h-38.4", "v259.2" ] ],
+    [ "dht1:GND", "esp:GND.2", "black", [ "v48", "h57.6" ] ],
+    [ "chip1:GND", "esp:GND.3", "black", [ "h-124.8", "v-9.6" ] ],
+    [ "gas1:GND", "esp:GND.1", "black", [ "h115.2", "v56.8" ] ],
+    [ "dht1:SDA", "esp:4", "green", [ "v57.6", "h105.7", "v172.8" ] ],
+    [ "gas1:AOUT", "esp:35", "green", [ "h0" ] ],
+    [ "chip1:A0", "esp:34", "green", [ "h-76.8", "v-115.2", "h-182.4", "v76.8", "h9.6" ] ]
+  ],
+  "dependencies": {}
+}
