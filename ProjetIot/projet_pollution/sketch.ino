@@ -14,7 +14,7 @@ const char* password = "";
 
 // --- Connexion MQTT ---
 const char* thingsboard_server = "demo.thingsboard.io";  
-const char* thingsboard_token = "7hxlh970qiug6qnu3t4z"; 
+const char* thingsboard_token = <ADD TOKEN HERE>"; 
 const int mqtt_port = 1883;
 
 // --- Connexion MQTT à Google Colab (utilise ton IP locale) ---
