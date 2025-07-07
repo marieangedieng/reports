@@ -1,0 +1,440 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+Importation du dataset
+```{r}
+df <- read.csv("data_infarctus.csv", sep = ";", header=TRUE)
+```
+
+En-tête
+```{r}
+head(df)
+```
+
+Se débarasser de la colonne index:
+```{r}
+df <- df[, !(names(df) %in% c("NUMERO"))]
+```
+
+Verifier la dimension du dataset
+```{r}
+dim(df)
+```
+
+Verifier les noms de colonnes
+```{r}
+names(df)
+```
+
+Verifier le type des colonnes
+```{r}
+str(df)
+```
+
+Valeurs manquantes:
+```{r}
+colSums(is.na(df))
+```
+
+```{r}
+summary(df)
+```
+
+#Analyse descriptive:
+
+##Preparation des variables
+
+-Recuperatiion des variables quantitatives:
+```{r}
+age <-df$AGE
+taille <-df$TAILLE
+poids <-df$POIDS
+```
+
+-Recuperatiion des variables qualitatives:
+```{r}
+infarctus <-factor(df$INFARCT, levels=c(0,1), labels=c("non", "oui"))
+contraceptif <- factor(df$CO, levels=c(0,1), labels=c("non", "oui"))
+antecedent <- factor(df$ATCD, levels=c(0,1), labels=c("non", "oui"))
+hypertension <- factor(df$HTA, levels=c(0,1), labels=c("non", "oui"))
+tabac <- factor(df$TABAC, levels=c(0,1,2), labels=c("nonfumeuse", "actuelle", "ancienne"))
+```
+
+##Analyse descriptive univariee:
+
+-variables quantitatives:
+```{r}
+summary(age)
+mean(age)
+sd(age)
+hist(age)
+boxplot(age)
+```
+
+```{r}
+summary(taille)
+mean(taille)
+sd(taille)
+hist(taille)
+boxplot(taille)
+```
+
+```{r}
+summary(poids)
+mean(poids, na.rm = TRUE)
+sd(poids, na.rm = TRUE)
+hist(poids)
+boxplot(poids)
+```
+
+-variables qualitatives:
+```{r}
+table(infarctus)
+table(contraceptif)
+table(antecedent)
+table(hypertension)
+table(tabac)
+```
+```{r}
+library(ggplot2)
+ggplot(data = df, aes(x = factor(INFARCT, labels = c("Non", "Oui")))) +
+  geom_bar(fill = "steelblue") +
+  labs(title = "Répartition des infarctus", x = "Infarctus", y = "Nombre d'individus") +
+  theme_minimal()
+```
+```{r}
+library(ggplot2)
+ggplot(data = df, aes(x = factor(TABAC, labels = c("Nonfumeuse", "Actuelle", "Ancienne")))) +
+  geom_bar(fill = "darkgreen") +
+  labs(title = "Répartition des consommations de tabac", x = "TABAC", y = "Nombre d'individus") +
+  theme_minimal()
+```
+```{r}
+library(ggplot2)
+ggplot(data = df, aes(x = factor(CO, labels = c("Non", "Oui")))) +
+  geom_bar(fill = "pink") +
+  labs(title = "Répartition des Contraceptifs", x = "CO", y = "Nombre d'individus") +
+  theme_minimal()
+```
+
+
+```{r}
+library(ggplot2)
+ggplot(data = df, aes(x = factor(ATCD, labels = c("Non", "Oui")))) +
+  geom_bar(fill = "darkred") +
+  labs(title = "Répartition des Antécédents", x = "ATCD", y = "Nombre d'individus") +
+  theme_minimal()
+```
+```{r}
+library(ggplot2)
+ggplot(data = df, aes(x = factor(HTA, labels = c("Non", "Oui")))) +
+  geom_bar(fill = "yellow") +
+  labs(title = "Répartition des Hypertension", x = "HTDA", y = "Nombre d'individus") +
+  theme_minimal()
+```
+
+#Analyse bivariee:
+
+-variable cible infarctus
+
+## quanti vs infarctus
+Boxplot
+```{r}
+boxplot(age~infarctus)
+boxplot(taille~infarctus)
+boxplot(poids~infarctus)
+imc=poids/(taille/100)^2
+boxplot(imc~infarctus)
+```
+
+
+Matrice de corrélation
+```{r}
+df_num <- df[, c("INFARCT", "AGE", "TAILLE", "POIDS")]
+df_num <- na.omit(df_num)
+cor_matrix <- cor(df_num, use = "complete.obs")
+library(ggcorrplot)
+ggcorrplot(cor_matrix, method = "square", type = "lower", lab = TRUE)
+```
+
+Comparaison entre les groupes
+```{r}
+t.test(age~infarctus, var.equal = FALSE)
+t.test(poids~infarctus,  var.equal = FALSE)
+t.test(taille~infarctus, var.equal = FALSE)
+t.test(imc~infarctus, var.equal = FALSE)
+```
+
+
+##quali vs infarctus
+```{r}
+table(infarctus, contraceptif)
+table(infarctus, tabac)
+table(infarctus, antecedent)
+table(infarctus, hypertension)
+```
+
+Test de khi deux:
+```{r}
+k1 <- chisq.test(table(infarctus, contraceptif), correct = FALSE)
+k2 <- chisq.test(table(infarctus, tabac), correct = FALSE)
+k3 <- chisq.test(table(infarctus, antecedent), correct = FALSE)
+k4 <- chisq.test(table(infarctus, hypertension), correct = FALSE)
+print("Contraceptif :")
+k1
+print("Tabac :")
+k2
+print("Antecedent :")
+k3
+print("Hypertension :")
+k4
+```
+
+```{r}
+qchisq(1-0.05, 1)
+```
+```{r}
+qchisq(1-0.05,2)
+```
+```{r}
+qchisq(1-0.1,1)
+```
+```{r}
+qchisq(1-0.025,1)
+```
+```{r}
+qchisq(1-0.01,1)
+```
+
+
+Indicateurs de spécificité:
+```{r}
+k1$observed/k1$expected
+k2$observed/k2$expected
+k3$observed/k3$expected
+k4$observed/k4$expected
+```
+
+Chi-2 calcule:
+```{r}
+chicalc1 <- sum((k1$observed-k1$expected)^2/k1$expected)
+print("Contraceptif :")
+chicalc1
+chicalc2 <- sum((k2$observed-k2$expected)^2/k2$expected)
+print("Tabac :")
+chicalc2
+chicalc3 <- sum((k3$observed-k3$expected)^2/k3$expected)
+print("Antecedent :")
+chicalc3
+chicalc4 <- sum((k4$observed-k4$expected)^2/k4$expected)
+print("Hypertension :")
+chicalc4
+```
+
+Chi-2 theorique:
+```{r}
+alpha <- 0.05
+
+# Contraceptif
+khi_theorique1 <- qchisq(1 - alpha, 1)
+print("Khi-2 théorique (Contraceptif) :")
+khi_theorique1
+
+# Tabac
+khi_theorique2 <- qchisq(1 - alpha, 2)
+print("Khi-2 théorique (Tabac) :")
+khi_theorique2
+
+# Antécédents
+khi_theorique3 <- qchisq(1 - alpha, 1)
+print("Khi-2 théorique (Antécédents) :")
+khi_theorique3
+
+# Hypertension
+khi_theorique4 <- qchisq(1 - alpha, 1)
+print("Khi-2 théorique (Hypertension) :")
+khi_theorique4
+```
+
+Comparaison:
+```{r}
+verifier_independance <- function(khi_calc, khi_theorique) {
+  if (khi_calc > khi_theorique) {
+    return("Les variables sont dépendantes")
+  } else {
+    return("Les variables sont indépendantes")
+  }
+}
+```
+
+```{r}
+print("Contraceptif :")
+print(verifier_independance(chicalc1, khi_theorique1))
+
+print("Tabac :")
+print(verifier_independance(chicalc2, khi_theorique2))
+
+print("Antécédents :")
+print(verifier_independance(chicalc3, khi_theorique3))
+
+print("Hypertension :")
+print(verifier_independance(chicalc4, khi_theorique4))
+
+```
+```{r}
+library(gmodels)
+```
+```{r}
+print("Contraceptif :")
+CrossTable(infarctus, contraceptif, expected=TRUE)
+print("Tabac :")
+CrossTable(infarctus, tabac, expected=TRUE)
+print("Antécédents :")
+CrossTable(infarctus, antecedent, expected=TRUE)
+print("Hypertension :")
+CrossTable(infarctus, hypertension, expected=TRUE)
+```
+
+##Analyse multivarie
+```{r}
+library(FactoMineR)
+library(factoextra)
+library(explor)
+```
+
+### ACP sur des données quantitatives
+```{r}
+df_quanti <- data.frame(df$INFARCT, df$CO, df$TABAC, df$AGE, df$POIDS, df$TAILLE, df$ATCD, df$HTA)
+head(df)
+```
+
+```{r}
+df_quanti <- na.omit(df_quanti)
+```
+
+```{r}
+df_quanti <- scale(df_quanti)
+head(df_quanti)
+```
+
+```{r}
+acp_v1 <- PCA(df_quanti)
+```
+#INFARCT est positivement correlé à CO et TABAC
+```{r}
+df_quanti <- data.frame(df$INFARCT, df$CO, df$TABAC, df$AGE, imc, df$ATCD, df$HTA)
+df_quanti <- na.omit(df_quanti)
+df_quanti <- scale(df_quanti)
+acp_v2 <- PCA(df_quanti)
+```
+#MCA sur des données qualitatives
+```{r}
+qinfarctus <- infarctus
+qcontraceptif <- contraceptif
+qtabac <- tabac
+qantecedent <- antecedent
+qhypertension <- hypertension
+```
+
+```{r}
+qage <- cut(age, breaks =c(14,33,44,56,100), labels=c("age1", "age2", "age3", "age4"))
+qpoids <- cut(poids, breaks =c(30,51,64,79,130), labels=c("poids1", "poids2", "poids3", "poids4"))
+qtaille <- cut(taille, breaks =c(130,160,166,171,184), labels=c("taille1", "taille2", "taille3", "taille4"))
+qimc <- cut(imc, breaks =c(0,18.5,25,50), labels=c("imc_inf_18.5", "imc18.5_25", "imc_sup_25"))
+```
+
+```{r}
+df_quali <- data.frame(qinfarctus, qcontraceptif, qantecedent, qhypertension, qtabac, qage, qimc)
+df_quali <- na.omit(df_quali)
+```
+
+```{r}
+mca_v1 <- MCA(df_quali)
+```
+
+```{r}
+fviz_mca_biplot(mca_v1,
+                repel = TRUE,
+                geom.ind = c("point"),
+                col.ind = df_quali$qinfarctus,  # Couleur des individues
+                # col.ind = as.factor(groupe.kmeans),  # Couleur des individues
+                alpha.ind = 0.3,
+                geom.var = c("point", "text"),
+                col.var = "black", # Couleur des variables
+                # arrows = c(FALSE, TRUE),
+                # pointsize = 1,
+                shape.var = 15,
+                size.var = 6,
+                addEllipses = TRUE
+)
+```
+
+#Modelisation
+
+
+```{r}
+library(caret)
+```
+
+##Division en train et test
+```{r}
+set.seed(123)
+taux_train <- 0.8
+indices <- sample(nrow(df_quali), nrow(df_quali)*taux_train)
+df_train <- df_quali[indices,]
+df_test <- df_quali[-indices,]
+```
+
+##Logistic Regression
+
+```{r}
+logistic <- train(qinfarctus~., data=df_train,
+                  method="glm",
+                  trControl = trainControl(method="repeatedcv",
+                                           number=10,
+                                           repeats=3),
+                  family="binomial")
+summary(logistic)
+exp(coef(logistic$finalModel))
+library(vip)
+importance_logit <- vip(logistic, num_features =20)
+importance_logit$data
+plot(importance_logit)
+predictions_logit <- predict(logistic, newdata=df_test)
+confusionMatrix(predictions_logit, df_test$qinfarctus)
+```
+
+
+#RandomForest
+```{r}
+rf <- train(qinfarctus~., data=df_train,
+                  method="rf",
+                  trControl = trainControl(method="repeatedcv",
+                                           number=10,
+                                           repeats=3),
+                  ntree=500)
+summary(rf)
+importance_rf <- vip(rf, num_features =20)
+importance_rf$data
+plot(importance_rf)
+predictions_rf <- predict(rf, newdata=df_test)
+confusionMatrix(predictions_rf, df_test$qinfarctus)
+```
+
+#SVM
+```{r}
+svm <- train(qinfarctus~., data=df_train,
+                  method="svmRadial",
+                  trControl = trainControl(method="repeatedcv",
+                                           number=10,
+                                           repeats=3),)
+summary(svm)
+importance_svm <- varImp(svm)
+plot(importance_svm)
+predictions_svm <- predict(svm, newdata=df_test)
+confusionMatrix(predictions_svm, df_test$qinfarctus)
+```
+
